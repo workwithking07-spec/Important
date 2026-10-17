@@ -135,7 +135,7 @@ function ui(){
 $("sform").style.display=tok?"none":"";$("son").style.display=tok?"":"none";
 $("sinfo").textContent=tok?"Signed in ✓ — programs tumchya private Firebase account madhe save hotat.":"Ek veli Google ne sign in kara, mag sarv device var programs sync hotil.";
 if(!tok){badge("💾 Fakt ya device var");$("sd").open=true}}
-$("tc").onclick=function(){if(!window.FB){say("Firebase load hot aahe, thamba");return}FB.login().catch(function(){say("Sign in zhale nahi")})};
+$("tc").onclick=function(){if(!window.FB){say("Firebase load hot aahe, thamba");return}FB.login().catch(function(e){var c=(e&&e.code)||String(e);$("sinfo").textContent="Sign in error: "+c;alert("Sign in error: "+c)})};
 $("sn").onclick=function(){sync()};
 $("sx").onclick=function(){if(!confirm("Sign out karayche? (Ya device cha data rahil)"))return;FB.logout()};
 window.addEventListener("fb-auth",function(ev){tok=!!ev.detail;ui();if(tok){badge("☁ Signed in");sync()}});
@@ -262,6 +262,7 @@ window.addEventListener("focus",function(){sync()});
 setInterval(function(){if(!document.hidden)sync()},90000);
 })();
 </script>
+<script>window.addEventListener("error",function(e){if(e.target&&e.target.tagName==="SCRIPT")console.log("script load fail")},true)</script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
