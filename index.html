@@ -63,8 +63,8 @@ details.b>summary{cursor:pointer;color:var(--mut)}
 <details class="b" id="sd">
 <summary>☁ Cloud Sync</summary>
 <p class="mut" id="sinfo"></p>
-<div id="sform"><div class="row"><button class="p" id="tc">🔐 Google ne Sign in</button></div></div>
-<div id="son" class="row" style="display:none"><button id="sn" class="p">🔄 Sync ata</button><button id="sx" class="d">Sign out</button></div>
+<div id="sform"></div>
+<div id="son" class="row" style="display:none"><button id="sn" class="p">🔄 Sync ata</button></div>
 </details>
 <details class="b">
 <summary>Backup / Restore</summary>
@@ -133,12 +133,10 @@ return after!==rem?FB.write(after):0})
 function sortO(o){o=o||{};var r={};Object.keys(o).sort().forEach(function(k){r[k]=o[k]});return r}
 function ui(){
 $("sform").style.display=tok?"none":"";$("son").style.display=tok?"":"none";
-$("sinfo").textContent=tok?"Signed in ✓ — programs tumchya private Firebase account madhe save hotat.":"Ek veli Google ne sign in kara, mag sarv device var programs sync hotil.";
+$("sinfo").textContent=tok?"Cloud sync chalu ✓ — sarv device var same data disto.":"Cloud sync chalu hot aahe…";
 if(!tok){badge("💾 Fakt ya device var");$("sd").open=true}}
-$("tc").onclick=function(){if(!window.FB){say("Firebase load hot aahe, thamba");return}FB.login().catch(function(e){var c=(e&&e.code)||String(e);$("sinfo").textContent="Sign in error: "+c;alert("Sign in error: "+c)})};
 $("sn").onclick=function(){sync()};
-$("sx").onclick=function(){if(!confirm("Sign out karayche? (Ya device cha data rahil)"))return;FB.logout()};
-window.addEventListener("fb-auth",function(ev){tok=!!ev.detail;ui();if(tok){badge("☁ Signed in");sync()}});
+window.addEventListener("fb-auth",function(ev){tok=!!ev.detail;ui();if(tok){badge("☁ Connected");sync()}});
 /* ---- UI ---- */
 function render(){
 var q=$("q").value.toLowerCase(),box=$("list"),sc=box.scrollTop;box.innerHTML="";
@@ -262,10 +260,8 @@ window.addEventListener("focus",function(){sync()});
 setInterval(function(){if(!document.hidden)sync()},90000);
 })();
 </script>
-<script>window.addEventListener("error",function(e){if(e.target&&e.target.tagName==="SCRIPT")console.log("script load fail")},true)</script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {getFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 const app=initializeApp({
   apiKey:"AIzaSyCxgwEWW0ZBYXhBHGBgGfeHLMxvb8eavu4",
@@ -275,15 +271,13 @@ const app=initializeApp({
   messagingSenderId:"25072063978",
   appId:"1:25072063978:web:ac93d410d2c56e1be30e93"
 });
-const auth=getAuth(app),db=getFirestore(app);
-const ref=()=>doc(db,"users",auth.currentUser.uid);
+const db=getFirestore(app);
+const ref=()=>doc(db,"shared","codekothi");
 window.FB={
-  login:()=>signInWithPopup(auth,new GoogleAuthProvider()),
-  logout:()=>signOut(auth),
   read:async()=>{const x=await getDoc(ref());return x.exists()?JSON.parse(x.data().data||"{}"):{}},
   write:(j)=>setDoc(ref(),{data:j,updated:Date.now()})
 };
-onAuthStateChanged(auth,u=>window.dispatchEvent(new CustomEvent("fb-auth",{detail:u?u.uid:null})));
+window.dispatchEvent(new CustomEvent("fb-auth",{detail:"public"}));
 </script>
 </body>
 </html>
