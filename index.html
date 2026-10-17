@@ -61,10 +61,10 @@ details.b>summary{cursor:pointer;color:var(--mut)}
 <div class="row"><input id="fn" placeholder="Navin folder cha naav (utaharan: Python)"><button id="nf">📁 + Folder</button></div>
 <div id="list"></div>
 <details class="b" id="sd">
-<summary>☁ GitHub Sync</summary>
+<summary>☁ Cloud Sync</summary>
 <p class="mut" id="sinfo"></p>
-<div id="sform"><label for="tk">GitHub token (fakt gist permission)</label><input id="tk" type="password" placeholder="ghp_..." autocomplete="off"><div class="row"><button class="p" id="tc">Connect</button></div></div>
-<div id="son" class="row" style="display:none"><button id="sn" class="p">🔄 Sync ata</button><button id="sx" class="d">Disconnect</button></div>
+<div id="sform"><div class="row"><button class="p" id="tc">🔐 Google ne Sign in</button></div></div>
+<div id="son" class="row" style="display:none"><button id="sn" class="p">🔄 Sync ata</button><button id="sx" class="d">Sign out</button></div>
 </details>
 <details class="b">
 <summary>Backup / Restore</summary>
@@ -105,12 +105,10 @@ function lget(k,d){try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e
 function loadLocal(){
 items=lget(K,[]);fmap=lget(FM,{});del=lget(DK,{});
 lget(FK,[]).forEach(function(n){var k=n.toLowerCase();if(!fmap[k])fmap[k]={n:n,u:1,d:0}});
-try{tok=localStorage.getItem(GT)||"";gid=localStorage.getItem(GI)||""}catch(e){}}
+}
 function saveLocal(){try{localStorage.setItem(K,JSON.stringify(items));localStorage.setItem(FM,JSON.stringify(fmap));localStorage.setItem(DK,JSON.stringify(del));return true}catch(e){say("Local save honyat adchan (storage bhara?)");return false}}
 function changed(){saveLocal();if(tok){clearTimeout(pt);pt=setTimeout(sync,1200);say("Save zhale ✓ (sync hot aahe…)")}else say("Save zhale ✓ (fakt ya device var)")}
 /* ---- GitHub Gist ---- */
-function gh(path,opt){opt=opt||{};opt.headers={Authorization:"Bearer "+tok,Accept:"application/vnd.github+json"};
-return fetch("https://api.github.com"+path,opt).then(function(r){if(!r.ok){var e=new Error("HTTP "+r.status);e.status=r.status;throw e}return r.json()})}
 function pack(){
 var it=items.map(function(x){return {id:x.id,t:x.t||"",l:x.l||"",g:x.g||"",c:x.c||"",n:x.n||"",u:x.u||0}}).sort(function(a,b){return a.id<b.id?-1:1});
 var d={},f={};Object.keys(del).sort().forEach(function(k){d[k]=del[k]});Object.keys(fmap).sort().forEach(function(k){f[k]=fmap[k]});
@@ -121,39 +119,26 @@ Object.keys(r.fmap||{}).forEach(function(k){var a=fmap[k],b=r.fmap[k];if(!a||(b.
 var m={};items.forEach(function(x){m[x.id]=x});
 (r.items||[]).forEach(function(x){var a=m[x.id];if(!a||(x.u||0)>(a.u||0))m[x.id]=x});
 items=Object.keys(m).map(function(k){return m[k]}).filter(function(x){return !(del[x.id]>=(x.u||0))});}
-function readGist(){return gh("/gists/"+gid).then(function(g){var f=g.files&&g.files[FILE];if(!f)return {};
-if(f.truncated)return fetch(f.raw_url).then(function(r){return r.text()}).then(JSON.parse);
-return JSON.parse(f.content||"{}")})}
-function findGist(p){p=p||1;return gh("/gists?per_page=100&page="+p).then(function(a){
-for(var i=0;i<a.length;i++){if(a[i].description===DESC&&a[i].files&&a[i].files[FILE])return a[i].id}
-return a.length===100&&p<5?findGist(p+1):""})}
-function writeGist(){var files={};files[FILE]={content:pack()};return gh("/gists/"+gid,{method:"PATCH",body:JSON.stringify({files:files})})}
-function setGid(g){gid=g;try{localStorage.setItem(GI,g)}catch(e){}}
 function badge(m){$("sy").textContent=m}
 function sync(){
-if(!tok)return;if(busy){again=true;return}
+if(!tok||!window.FB)return;if(busy){again=true;return}
 busy=true;badge("⏳ Sync…");
-var p=gid?Promise.resolve(gid):findGist();
-p.then(function(id){
-if(!id){var files={};files[FILE]={content:pack()};return gh("/gists",{method:"POST",body:JSON.stringify({description:DESC,public:false,files:files})}).then(function(g){setGid(g.id)})}
-setGid(id);
-return readGist().then(function(r){var before=pack();merge(r||{});var after=pack();
+FB.read().then(function(r){r=r||{};merge(r);var after=pack();
 var rem=JSON.stringify({v:1,items:(r.items||[]).map(function(x){return {id:x.id,t:x.t||"",l:x.l||"",g:x.g||"",c:x.c||"",n:x.n||"",u:x.u||0}}).sort(function(a,b){return a.id<b.id?-1:1}),del:sortO(r.del),fmap:sortO(r.fmap)});
-return after!==rem?writeGist():0})})
+return after!==rem?FB.write(after):0})
 .then(function(){saveLocal();render();var d=new Date();badge("☁ Sync zhale "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2))})
-.catch(function(e){if(e.status===404)setGid("");badge("⚠ Sync error"+(e.status?" ("+e.status+")":""));
-if(e.status===401)say("Token chukicha kinva expire zhala aahe")})
+.catch(function(e){badge("⚠ Sync error");say(e&&e.code==="permission-denied"?"Firestore Rules check kara":"Sync madhe adchan")})
 .then(function(){busy=false;if(again){again=false;sync()}});
 }
 function sortO(o){o=o||{};var r={};Object.keys(o).sort().forEach(function(k){r[k]=o[k]});return r}
 function ui(){
 $("sform").style.display=tok?"none":"";$("son").style.display=tok?"":"none";
-$("sinfo").textContent=tok?"Connected ✓ — programs private Gist madhe save hotat.":"Ek veli GitHub token takla ki sarv device var programs sync hotil.";
+$("sinfo").textContent=tok?"Signed in ✓ — programs tumchya private Firebase account madhe save hotat.":"Ek veli Google ne sign in kara, mag sarv device var programs sync hotil.";
 if(!tok){badge("💾 Fakt ya device var");$("sd").open=true}}
-$("tc").onclick=function(){var t=$("tk").value.trim();if(!t){say("Token paste kara");return}
-tok=t;gh("/user").then(function(){try{localStorage.setItem(GT,t)}catch(e){}$("tk").value="";ui();say("Connected ✓");sync()},function(e){tok="";say(e.status===401?"Token barobar nahi":"Connect honyat adchan")})};
+$("tc").onclick=function(){if(!window.FB){say("Firebase load hot aahe, thamba");return}FB.login().catch(function(){say("Sign in zhale nahi")})};
 $("sn").onclick=function(){sync()};
-$("sx").onclick=function(){if(!confirm("Disconnect karayche? (Ya device cha data rahil)"))return;tok="";setGid("");try{localStorage.removeItem(GT)}catch(e){}ui()};
+$("sx").onclick=function(){if(!confirm("Sign out karayche? (Ya device cha data rahil)"))return;FB.logout()};
+window.addEventListener("fb-auth",function(ev){tok=!!ev.detail;ui();if(tok){badge("☁ Signed in");sync()}});
 /* ---- UI ---- */
 function render(){
 var q=$("q").value.toLowerCase(),box=$("list"),sc=box.scrollTop;box.innerHTML="";
@@ -276,6 +261,28 @@ document.addEventListener("visibilitychange",function(){if(!document.hidden)sync
 window.addEventListener("focus",function(){sync()});
 setInterval(function(){if(!document.hidden)sync()},90000);
 })();
+</script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const app=initializeApp({
+  apiKey:"AIzaSyCxgwEWW0ZBYXhBHGBgGfeHLMxvb8eavu4",
+  authDomain:"my-website-be69d.firebaseapp.com",
+  projectId:"my-website-be69d",
+  storageBucket:"my-website-be69d.firebasestorage.app",
+  messagingSenderId:"25072063978",
+  appId:"1:25072063978:web:ac93d410d2c56e1be30e93"
+});
+const auth=getAuth(app),db=getFirestore(app);
+const ref=()=>doc(db,"users",auth.currentUser.uid);
+window.FB={
+  login:()=>signInWithPopup(auth,new GoogleAuthProvider()),
+  logout:()=>signOut(auth),
+  read:async()=>{const x=await getDoc(ref());return x.exists()?JSON.parse(x.data().data||"{}"):{}},
+  write:(j)=>setDoc(ref(),{data:j,updated:Date.now()})
+};
+onAuthStateChanged(auth,u=>window.dispatchEvent(new CustomEvent("fb-auth",{detail:u?u.uid:null})));
 </script>
 </body>
 </html>
