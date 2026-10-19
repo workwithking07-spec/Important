@@ -6,6 +6,10 @@
 <title>CodeKothi</title>
 <meta name="description" content="CodeKothi - my programs, all in one place">
 <meta name="theme-color" content="#2f6fed">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f6fed'/%3E%3Cpath d='M12 32 32 14l20 18M18 30v20h28V30' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
 :root{--bg:#f7f7f5;--card:#fff;--tx:#1d1d1b;--mut:#6b6b66;--bd:#dcdcd6;--ac:#2f6fed;--acx:#fff;--dg:#c0392b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
@@ -64,7 +68,7 @@ details.b>summary{cursor:pointer;color:var(--mut)}
 <header>
 <h1><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="var(--ac)"/><path d="M12 32 32 14l20 18M18 30v20h28V30" fill="none" stroke="var(--acx)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg> CodeKothi <span class="mut">· my programs</span></h1><span id="sy" class="mut"></span>
 <span id="st"></span>
-<button id="th" title="Theme">🌓</button>
+<button id="ins" hidden>📲 Install</button><button id="th" title="Theme">🌓</button>
 </header>
 <section class="hero"><div><h2>My programs, all in one place.</h2><p>Save your code, sort it into folders by language, and find it from anywhere.</p></div>
 <svg class="hi" viewBox="0 0 240 130" aria-hidden="true"><path d="M20 62 120 8l100 54" fill="none" stroke="var(--ac)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><rect x="40" y="52" width="160" height="70" rx="8" fill="var(--card)" stroke="var(--bd)" stroke-width="2"/><circle cx="54" cy="64" r="3.5" fill="#ff5f57"/><circle cx="66" cy="64" r="3.5" fill="#febc2e"/><circle cx="78" cy="64" r="3.5" fill="#28c840"/><g stroke-width="5" stroke-linecap="round" fill="none"><path d="M54 82h34" stroke="#6b9bff"/><path d="M94 82h50" stroke="#e34c26"/><path d="M64 94h60" stroke="#4eaa25"/><path d="M130 94h30" stroke="#f7b500"/><path d="M64 106h24" stroke="#b07cf0"/><path d="M94 106h56" stroke="var(--mut)"/></g></svg></section>
@@ -128,7 +132,7 @@ items=lget(K,[]);fmap=lget(FM,{});del=lget(DK,{});
 lget(FK,[]).forEach(function(n){var k=n.toLowerCase();if(!fmap[k])fmap[k]={n:n,u:1,d:0}});
 }
 function saveLocal(){try{localStorage.setItem(K,JSON.stringify(items));localStorage.setItem(FM,JSON.stringify(fmap));localStorage.setItem(DK,JSON.stringify(del));return true}catch(e){say("Could not save locally (storage full?)");return false}}
-function changed(){saveLocal();if(tok){clearTimeout(pt);pt=setTimeout(sync,1200);say("Saved ✓ (syncing…)")}else say("Saved ✓ (this device only)")}
+function changed(){saveLocal();if(tok){clearTimeout(pt);pt=setTimeout(sync,1200);say(navigator.onLine?"Saved ✓ (syncing…)":"Saved ✓ (will sync when you are online)")}else say("Saved ✓ (this device only)")}
 /* ---- GitHub Gist ---- */
 function pack(){
 var it=items.map(function(x){return {id:x.id,t:x.t||"",l:x.l||"",g:x.g||"",c:x.c||"",n:x.n||"",u:x.u||0}}).sort(function(a,b){return a.id<b.id?-1:1});
@@ -142,7 +146,7 @@ var m={};items.forEach(function(x){m[x.id]=x});
 items=Object.keys(m).map(function(k){return m[k]}).filter(function(x){return !(del[x.id]>=(x.u||0))});}
 function badge(m){$("sy").textContent=m}
 function sync(){
-if(!tok||!window.FB)return;if(busy){again=true;return}
+if(!tok||!window.FB)return;if(!navigator.onLine){badge("📴 Offline - changes sync when you are back online");return}if(busy){again=true;return}
 busy=true;badge("⏳ Sync…");
 FB.read().then(function(r){r=r||{};merge(r);var after=pack();
 var rem=JSON.stringify({v:1,items:(r.items||[]).map(function(x){return {id:x.id,t:x.t||"",l:x.l||"",g:x.g||"",c:x.c||"",n:x.n||"",u:x.u||0}}).sort(function(a,b){return a.id<b.id?-1:1}),del:sortO(r.del),fmap:sortO(r.fmap)});
@@ -316,6 +320,17 @@ var r=document.documentElement,d=r.getAttribute("data-theme")==="dark"||(!r.getA
 var v=d?"light":"dark";r.setAttribute("data-theme",v);try{localStorage.setItem(TK,v)}catch(e){}
 };
 try{var tv=localStorage.getItem(TK);if(tv)document.documentElement.setAttribute("data-theme",tv)}catch(e){}
+/* offline support */
+window.addEventListener("online",function(){sync()});
+window.addEventListener("offline",function(){if(tok)badge("📴 Offline - changes sync when you are back online")});
+var ip=null;
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();ip=e;$("ins").hidden=false});
+$("ins").onclick=function(){if(ip){ip.prompt();ip=null;$("ins").hidden=true}};
+window.addEventListener("appinstalled",function(){$("ins").hidden=true});
+if("serviceWorker" in navigator){var had=navigator.serviceWorker.controller;
+navigator.serviceWorker.register("sw.js").then(function(reg){
+reg.addEventListener("updatefound",function(){var w=reg.installing;
+if(w)w.addEventListener("statechange",function(){if(w.state==="installed"&&!had)say("Offline mode ready ✓")})})}).catch(function(){})}
 loadLocal();render();showTg();ui();
 if(tok){badge("☁ Connected");sync()}
 document.addEventListener("visibilitychange",function(){if(!document.hidden)sync()});
