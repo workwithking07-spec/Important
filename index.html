@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html lang="mr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CodeKothi</title>
+<meta name="description" content="CodeKothi - my programs, all in one place">
+<meta name="theme-color" content="#2f6fed">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f6fed'/%3E%3Cpath d='M12 32 32 14l20 18M18 30v20h28V30' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
 :root{--bg:#f7f7f5;--card:#fff;--tx:#1d1d1b;--mut:#6b6b66;--bd:#dcdcd6;--ac:#2f6fed;--acx:#fff;--dg:#c0392b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161615;--card:#212120;--tx:#ececE8;--mut:#9a9a94;--bd:#3a3a37;--ac:#6b9bff;--acx:#10131a;--dg:#ff7b6b;color-scheme:dark}}
@@ -43,62 +46,80 @@ details.b{margin-top:12px}
 details.b>summary{cursor:pointer;color:var(--mut)}
 #st{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ac);color:var(--acx);padding:8px 16px;border-radius:8px;font-size:14px;z-index:20;max-width:90%;text-align:center}
 #st:empty{display:none}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.logo{width:26px;height:26px;vertical-align:-6px}
+.hero{width:calc(100% - 28px);max-width:1122px;margin:14px auto 0;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--card);border:1px solid var(--bd);border-radius:12px}
+.hero h2{margin:0 0 4px;font-size:22px}.hero p{margin:0;color:var(--mut);font-size:14px}
+.hi{width:170px;flex:none}
+@media(max-width:520px){.hi{width:105px}.hero h2{font-size:18px}}
+.lb{display:inline-block;min-width:26px;padding:1px 5px;margin-right:6px;border-radius:6px;font:700 11px/18px system-ui,sans-serif;text-align:center;vertical-align:1px}
+#dm{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:30;padding:16px}
+#dm[hidden]{display:none}
+.dbox{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:8px}
+.dbox button{width:100%;text-align:left}.dbox button:disabled{opacity:.5;cursor:default}
+.empty{text-align:center;padding:14px}.empty svg{width:90px}
 </style>
 </head>
 <body>
 <header>
-<h1>🏠 CodeKothi <span class="mut">· majhe programs</span></h1><span id="sy" class="mut"></span>
+<h1><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="var(--ac)"/><path d="M12 32 32 14l20 18M18 30v20h28V30" fill="none" stroke="var(--acx)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg> CodeKothi <span class="mut">· my programs</span></h1><span id="sy" class="mut"></span>
 <span id="st"></span>
 <button id="th" title="Theme">🌓</button>
 </header>
+<section class="hero"><div><h2>My programs, all in one place.</h2><p>Save your code, sort it into folders by language, and find it from anywhere.</p></div>
+<svg class="hi" viewBox="0 0 240 130" aria-hidden="true"><path d="M20 62 120 8l100 54" fill="none" stroke="var(--ac)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><rect x="40" y="52" width="160" height="70" rx="8" fill="var(--card)" stroke="var(--bd)" stroke-width="2"/><circle cx="54" cy="64" r="3.5" fill="#ff5f57"/><circle cx="66" cy="64" r="3.5" fill="#febc2e"/><circle cx="78" cy="64" r="3.5" fill="#28c840"/><g stroke-width="5" stroke-linecap="round" fill="none"><path d="M54 82h34" stroke="#6b9bff"/><path d="M94 82h50" stroke="#e34c26"/><path d="M64 94h60" stroke="#4eaa25"/><path d="M130 94h30" stroke="#f7b500"/><path d="M64 106h24" stroke="#b07cf0"/><path d="M94 106h56" stroke="var(--mut)"/></g></svg></section>
 <main>
 <section class="card">
-<input id="q" placeholder="Shodha (naav, language, code)…">
-<div id="drop">📂 Files ithe drag-drop kara<br>kinva click karun nivda<br><span class="mut">(ek veli anek files chalatat)</span></div>
+<input id="q" placeholder="Search (name, language, code, notes)…">
+<div id="drop">📂 Drag &amp; drop files here<br>or click to choose<br><span class="mut">(you can add several at once)</span></div>
 <input id="fi" type="file" multiple hidden>
 <div id="tg" class="mut" style="margin-top:6px"></div>
-<div class="row"><button class="p" id="new">+ Navin program</button></div>
-<div class="row"><input id="fn" placeholder="Navin folder cha naav (utaharan: Python)"><button id="nf">📁 + Folder</button></div>
+<div class="row"><button class="p" id="new">+ New program</button></div>
+<div class="row"><input id="fn" placeholder="New folder name (e.g. Python)"><button id="nf">📁 + Folder</button></div>
 <div id="list"></div>
 <details class="b" id="sd">
 <summary>☁ Cloud Sync</summary>
 <p class="mut" id="sinfo"></p>
 <div id="sform"></div>
-<div id="son" class="row" style="display:none"><button id="sn" class="p">🔄 Sync ata</button></div>
+<div id="son" class="row" style="display:none"><button id="sn" class="p">🔄 Sync now</button></div>
 </details>
 <details class="b">
 <summary>Backup / Restore</summary>
-<p class="mut">Export dabva, text copy kara ani dusrya machine var Import madhe paste kara.</p>
-<textarea id="bk" style="min-height:90px" placeholder="Backup JSON ithe yeil / paste kara"></textarea>
+<p class="mut">Click Export, copy the text, and paste it into Import on another machine.</p>
+<textarea id="bk" style="min-height:90px" placeholder="Backup JSON appears here / paste it here"></textarea>
 <div class="row"><button id="ex">Export</button><button id="cpb">Copy</button><button id="im" class="p">Import</button></div>
-<div class="row"><button id="exf">⬇ Backup file</button><button id="imf">⬆ File madhun import</button><input id="bf" type="file" accept=".json" hidden></div>
+<div class="row"><button id="exf">⬇ Backup file</button><button id="imf">⬆ Import from file</button><input id="bf" type="file" accept=".json" hidden></div>
 </details>
 </section>
 <section class="card">
-<label for="t">Naav</label>
-<input id="t" placeholder="Utaharan: Fibonacci">
+<label for="t">Name</label>
+<input id="t" placeholder="e.g. Fibonacci">
 <div class="row">
 <div><label for="l">Language (folder)</label><input id="l" list="langs" placeholder="Python, C, Java…">
 <datalist id="langs"></datalist></div>
 <div><label for="g">Tags</label><input id="g" placeholder="loop, array"></div>
 </div>
 <label for="c">Code</label>
-<textarea id="c" spellcheck="false" placeholder="Code paste kara kinva file upload kara…"></textarea>
+<textarea id="c" spellcheck="false" placeholder="Paste code or upload a file…"></textarea>
 <label for="n">Notes</label>
-<input id="n" placeholder="Kahi lihayche aahe?">
-<div class="row"><button class="p" id="sv">💾 Save</button><button id="cp">📋 Copy code</button><button class="d" id="dl">🗑 Delete</button></div>
+<input id="n" placeholder="Anything to note?">
+<div class="row"><button class="p" id="sv">💾 Save</button><button id="cp">📋 Copy code</button><button id="dw">⬇ Download</button><button class="d" id="dl">🗑 Delete</button></div>
 </section>
 </main>
+<div id="dm" hidden><div class="dbox" role="dialog" aria-label="Download"><b>⬇ Download</b>
+<button id="d1">📄 This program (file)</button><button id="d2">🗜 This folder (ZIP)</button><button id="d3">🗜 All programs (ZIP)</button><button id="d4">Cancel</button></div></div>
 <script>
 (function(){
 var K="majhe_programs_v1",TK="majhe_theme",FK="majhe_folders_v1",FM="ck_fmap",DK="ck_del",GT="ck_token",GI="ck_gist";
 var FILE="codekothi.json",DESC="CodeKothi data",MAXB=500000;
-var items=[],fmap={},del={},cur=null,openG={},jump=false,dlArm=0,dlT=null,target=null;
+var dirty=false,sayT,items=[],fmap={},del={},cur=null,openG={},jump=false,dlArm=0,dlT=null,target=null;
 var tok="",gid="",busy=false,again=false,pt=null;
 var $=function(i){return document.getElementById(i)};
 var EXT={py:"Python",c:"C",h:"C",cpp:"C++",cc:"C++",hpp:"C++",java:"Java",js:"JavaScript",mjs:"JavaScript",ts:"TypeScript",jsx:"JavaScript",tsx:"TypeScript",html:"HTML/CSS",htm:"HTML/CSS",css:"HTML/CSS",sql:"SQL",sh:"Bash",bash:"Bash",cs:"C#",go:"Go",rs:"Rust",php:"PHP",rb:"Ruby",kt:"Kotlin",swift:"Swift",r:"R",m:"MATLAB",json:"JSON",xml:"XML",md:"Notes",txt:"Notes",ipynb:"Python"};
-function say(m){$("st").textContent=m;setTimeout(function(){$("st").textContent=""},2500)}
+function say(m){$("st").textContent=m;clearTimeout(sayT);sayT=setTimeout(function(){$("st").textContent=""},2500)}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+var LC={"python":["#3776ab","Py"],"c":["#5c6bc0","C"],"c++":["#00599c","C+"],"java":["#e76f00","Jv"],"javascript":["#f7df1e","JS","#222"],"typescript":["#3178c6","TS"],"html/css":["#e34c26","<>"],"sql":["#336791","SQL"],"bash":["#4eaa25","$_"],"c#":["#68217a","C#"],"go":["#00add8","Go"],"rust":["#b7410e","Rs"],"php":["#777bb4","PHP"],"ruby":["#cc342d","Rb"],"kotlin":["#7f52ff","Kt"],"swift":["#fa7343","Sw"],"r":["#276dc3","R"],"matlab":["#e16737","Ml"],"json":["#555","{}"],"xml":["#0060ac","XML"],"notes":["#8a8a84","\u270e"]};
+function lbadge(n){var e=LC[n.toLowerCase()]||["#8a8a84",(n.charAt(0)||"?").toUpperCase()],b=document.createElement("span");b.className="lb";b.textContent=e[1];b.style.background=e[0];b.style.color=e[2]||"#fff";return b}
 function lang(x){return (x.l||"").trim()||"Other"}
 function fl(){return Object.keys(fmap).filter(function(k){return !fmap[k].d}).map(function(k){return fmap[k].n})}
 function lget(k,d){try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}}
@@ -106,8 +127,8 @@ function loadLocal(){
 items=lget(K,[]);fmap=lget(FM,{});del=lget(DK,{});
 lget(FK,[]).forEach(function(n){var k=n.toLowerCase();if(!fmap[k])fmap[k]={n:n,u:1,d:0}});
 }
-function saveLocal(){try{localStorage.setItem(K,JSON.stringify(items));localStorage.setItem(FM,JSON.stringify(fmap));localStorage.setItem(DK,JSON.stringify(del));return true}catch(e){say("Local save honyat adchan (storage bhara?)");return false}}
-function changed(){saveLocal();if(tok){clearTimeout(pt);pt=setTimeout(sync,1200);say("Save zhale ✓ (sync hot aahe…)")}else say("Save zhale ✓ (fakt ya device var)")}
+function saveLocal(){try{localStorage.setItem(K,JSON.stringify(items));localStorage.setItem(FM,JSON.stringify(fmap));localStorage.setItem(DK,JSON.stringify(del));return true}catch(e){say("Could not save locally (storage full?)");return false}}
+function changed(){saveLocal();if(tok){clearTimeout(pt);pt=setTimeout(sync,1200);say("Saved ✓ (syncing…)")}else say("Saved ✓ (this device only)")}
 /* ---- GitHub Gist ---- */
 function pack(){
 var it=items.map(function(x){return {id:x.id,t:x.t||"",l:x.l||"",g:x.g||"",c:x.c||"",n:x.n||"",u:x.u||0}}).sort(function(a,b){return a.id<b.id?-1:1});
@@ -125,83 +146,125 @@ if(!tok||!window.FB)return;if(busy){again=true;return}
 busy=true;badge("⏳ Sync…");
 FB.read().then(function(r){r=r||{};merge(r);var after=pack();
 var rem=JSON.stringify({v:1,items:(r.items||[]).map(function(x){return {id:x.id,t:x.t||"",l:x.l||"",g:x.g||"",c:x.c||"",n:x.n||"",u:x.u||0}}).sort(function(a,b){return a.id<b.id?-1:1}),del:sortO(r.del),fmap:sortO(r.fmap)});
-return after!==rem?FB.write(after):0})
-.then(function(){saveLocal();render();var d=new Date();badge("☁ Sync zhale "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2))})
-.catch(function(e){badge("⚠ Sync error");say(e&&e.code==="permission-denied"?"Firestore Rules check kara":"Sync madhe adchan")})
+if(after.length>900000){saveLocal();throw {code:"too-big"}}return after!==rem?FB.write(after):0})
+.then(function(){saveLocal();render();var d=new Date();badge("☁ Synced "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2))})
+.catch(function(e){badge("⚠ Sync error");say(e&&e.code==="permission-denied"?"Check your Firestore rules":e&&e.code==="too-big"?"Data is too large (1 MB limit) - delete old programs":"Sync problem")})
 .then(function(){busy=false;if(again){again=false;sync()}});
 }
 function sortO(o){o=o||{};var r={};Object.keys(o).sort().forEach(function(k){r[k]=o[k]});return r}
 function ui(){
 $("sform").style.display=tok?"none":"";$("son").style.display=tok?"":"none";
-$("sinfo").textContent=tok?"Cloud sync chalu ✓ — sarv device var same data disto.":"Cloud sync chalu hot aahe…";
-if(!tok){badge("💾 Fakt ya device var");$("sd").open=true}}
+$("sinfo").textContent=tok?"Cloud sync is on ✓ — your data is the same on every device.":"Cloud sync is starting…";
+if(!tok){badge("💾 This device only");$("sd").open=true}else $("sd").open=false}
 $("sn").onclick=function(){sync()};
+window.addEventListener("fb-fail",function(){$("sinfo").textContent="Cloud sync could not start (check your internet). Your data is saved on this device.";badge("📴 Offline")});
 window.addEventListener("fb-auth",function(ev){tok=!!ev.detail;ui();if(tok){badge("☁ Connected");sync()}});
 /* ---- UI ---- */
 function render(){
 var q=$("q").value.toLowerCase(),box=$("list"),sc=box.scrollTop;box.innerHTML="";
-var f=items.filter(function(x){return ((x.t||"")+" "+(x.l||"")+" "+(x.g||"")+" "+(x.c||"")).toLowerCase().indexOf(q)>-1});
+var f=items.filter(function(x){return ((x.t||"")+" "+(x.l||"")+" "+(x.g||"")+" "+(x.c||"")+" "+(x.n||"")).toLowerCase().indexOf(q)>-1});
 var gr={};f.forEach(function(x){var k=lang(x).toLowerCase();(gr[k]=gr[k]||{n:lang(x),a:[]}).a.push(x)});
 if(!q)fl().forEach(function(n){var k=n.toLowerCase();if(!gr[k])gr[k]={n:n,a:[]}});
 var keys=Object.keys(gr).sort();
-if(!keys.length){box.innerHTML='<p class="mut">Kahi sapadle nahi.</p>'}
+if(!keys.length){box.innerHTML='<div class="empty"><svg viewBox="0 0 80 60" aria-hidden="true"><path d="M6 14h24l6 8h38v32H6z" fill="none" stroke="var(--bd)" stroke-width="3" stroke-linejoin="round"/></svg><p class="mut">Nothing found.</p></div>'}
 keys.forEach(function(k){
 var g=gr[k],d=document.createElement("details");d.className="g";
 d.open=!!q||!!openG[k]||g.a.some(function(x){return x.id===cur});
-d.ontoggle=function(){openG[k]=d.open};
+d.ontoggle=function(){if(!$("q").value)openG[k]=d.open};
 var s=document.createElement("summary");s.innerHTML="<b></b><span></span>";
-s.firstChild.textContent="📁 "+g.n;
+s.firstChild.appendChild(lbadge(g.n));s.firstChild.appendChild(document.createTextNode(g.n));
 var sp=s.lastChild;sp.appendChild(document.createTextNode(g.a.length+" "));
-var ab=document.createElement("button");ab.className="sb";ab.textContent="＋";ab.title="Ya folder madhe navin program";
+var ab=document.createElement("button");ab.className="sb";ab.textContent="＋";ab.title="New program in this folder";
 ab.onclick=function(ev){ev.preventDefault();ev.stopPropagation();openG[k]=true;target=g.n;showTg();open_(null);$("l").value=g.n;$("t").focus()};
 sp.appendChild(ab);
-if(!g.a.length){var xb=document.createElement("button");xb.className="sb";xb.textContent="✕";xb.title="Rikama folder kadha";
+if(!g.a.length){var xb=document.createElement("button");xb.className="sb";xb.textContent="✕";xb.title="Remove empty folder";
 xb.onclick=function(ev){ev.preventDefault();ev.stopPropagation();var e=fmap[k]||{n:g.n};fmap[k]={n:e.n,u:Date.now(),d:1};changed();render()};
 sp.appendChild(xb)}
 d.appendChild(s);
 var ul=document.createElement("ul");
 g.a.sort(function(a,b){return (a.t||"").localeCompare(b.t||"")}).forEach(function(x){
 var li=document.createElement("li");if(x.id===cur)li.className="on";
-var b=document.createElement("b");b.textContent=x.t||"(naav nahi)";li.appendChild(b);
+var b=document.createElement("b");b.textContent=x.t||"(no name)";li.appendChild(b);
 if(x.g){var sm=document.createElement("small");sm.textContent=x.g;li.appendChild(sm)}
-li.onclick=function(){open_(x.id)};ul.appendChild(li)});
+li.onclick=function(){if(dirty&&!confirm("You have unsaved changes. Open another program anyway?"))return;open_(x.id)};ul.appendChild(li)});
 d.appendChild(ul);box.appendChild(d)});
 box.scrollTop=sc;if(jump){jump=false;var on=box.querySelector("li.on");if(on)on.scrollIntoView({block:"nearest"})}
 var dl=$("langs");dl.innerHTML="";
 var seen={};items.map(lang).concat(fl()).forEach(function(v){if(v!=="Other"&&!seen[v]){seen[v]=1;var o=document.createElement("option");o.value=v;dl.appendChild(o)}});
 }
-function showTg(){var e=$("tg");e.innerHTML="";e.appendChild(document.createTextNode("Upload kuthe jatil: "));
-var b=document.createElement("b");b.textContent=target?"📁 "+target:"Auto (file extension pramane)";e.appendChild(b);
-if(target){var c=document.createElement("button");c.className="sb";c.style.fontSize="13px";c.textContent="✕ Auto kara";c.onclick=function(){target=null;showTg()};e.appendChild(c)}}
+function showTg(){var e=$("tg");e.innerHTML="";e.appendChild(document.createTextNode("Uploads go to: "));
+var b=document.createElement("b");b.textContent=target?"📁 "+target:"Auto (by file extension)";e.appendChild(b);
+if(target){var c=document.createElement("button");c.className="sb";c.style.fontSize="13px";c.textContent="✕ Auto";c.onclick=function(){target=null;showTg()};e.appendChild(c)}}
 function resetDl(){dlArm=0;clearTimeout(dlT);$("dl").textContent="🗑 Delete"}
 function open_(id){
-resetDl();cur=id;var x=items.filter(function(i){return i.id===id})[0]||{t:"",l:"",g:"",c:"",n:""};
+resetDl();dirty=false;cur=id;var x=items.filter(function(i){return i.id===id})[0]||{t:"",l:"",g:"",c:"",n:""};
 $("t").value=x.t;$("l").value=x.l;$("g").value=x.g;$("c").value=x.c;$("n").value=x.n||"";render();
 }
-$("new").onclick=function(){open_(null);$("t").focus()};
+$("new").onclick=function(){if(dirty&&!confirm("You have unsaved changes. Start a new program anyway?"))return;open_(null);$("t").focus()};
 $("sv").onclick=function(){
 var o={t:$("t").value.trim(),l:$("l").value.trim(),g:$("g").value.trim(),c:$("c").value,n:$("n").value,u:Date.now()};
-if(!o.t&&!o.c){say("Naav kinva code lihaa");return}
+if(!o.t&&!o.c){say("Enter a name or some code");return}
 var x=items.filter(function(i){return i.id===cur})[0];
 if(x){Object.assign(x,o)}else{o.id=uid();items.push(o);cur=o.id}
-openG[lang(o).toLowerCase()]=true;jump=true;changed();render();
+openG[lang(o).toLowerCase()]=true;jump=true;dirty=false;changed();render();
 };
 $("dl").onclick=function(){
-if(!cur){say("Aadhi list madhun program nivda");return}
-if(!dlArm){dlArm=1;this.textContent="❓ Pakka? Parat dabva";dlT=setTimeout(resetDl,4000);return}
+if(!cur){say("Select a program from the list first");return}
+if(!dlArm){dlArm=1;this.textContent="❓ Sure? Press again";dlT=setTimeout(resetDl,4000);return}
 del[cur]=Date.now();items=items.filter(function(i){return i.id!==cur});changed();open_(null);
 };
 function copy(t){
-function fb(){var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");say("Copy zhale ✓")}catch(e){say("Copy zhale nahi")}a.remove()}
-if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){say("Copy zhale ✓")},fb)}else fb();
+function fb(){var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");say("Copied ✓")}catch(e){say("Copy failed")}a.remove()}
+if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){say("Copied ✓")},fb)}else fb();
 }
 $("cp").onclick=function(){copy($("c").value)};
+var RX={"Python":"py","C":"c","C++":"cpp","Java":"java","JavaScript":"js","TypeScript":"ts","HTML/CSS":"html","SQL":"sql","Bash":"sh","C#":"cs","Go":"go","Rust":"rs","PHP":"php","Ruby":"rb","Kotlin":"kt","Swift":"swift","R":"r","MATLAB":"m","JSON":"json","XML":"xml","Notes":"txt"};
+function safe(n){return String(n||"").replace(/[\\\/:*?"<>|]+/g,"_").trim()}
+function fname(t,l){var n=safe(t)||"program";if(!/\.[A-Za-z0-9]{1,6}$/.test(n))n+="."+(RX[(l||"").trim()]||"txt");return n}
+function save_(blob,n){var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=n;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},1000)}
+var CT=null;
+function crc(u){if(!CT){CT=[];for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;CT[n]=c>>>0}}var r=0xFFFFFFFF;for(var i=0;i<u.length;i++)r=CT[(r^u[i])&255]^(r>>>8);return (r^0xFFFFFFFF)>>>0}
+function zip(files){
+var enc=new TextEncoder(),parts=[],cen=[],off=0,dt=new Date();
+var tm=(dt.getHours()<<11)|(dt.getMinutes()<<5)|(dt.getSeconds()>>1),dd=((dt.getFullYear()-1980)<<9)|((dt.getMonth()+1)<<5)|dt.getDate();
+function w16(a,v){a.push(v&255,(v>>8)&255)}function w32(a,v){a.push(v&255,(v>>>8)&255,(v>>>16)&255,(v>>>24)&255)}
+files.forEach(function(f){var nb=enc.encode(f.n),db=enc.encode(f.d),cr=crc(db),h=[],c=[];
+w32(h,0x04034b50);w16(h,20);w16(h,0x0800);w16(h,0);w16(h,tm);w16(h,dd);w32(h,cr);w32(h,db.length);w32(h,db.length);w16(h,nb.length);w16(h,0);
+parts.push(new Uint8Array(h),nb,db);
+w32(c,0x02014b50);w16(c,20);w16(c,20);w16(c,0x0800);w16(c,0);w16(c,tm);w16(c,dd);w32(c,cr);w32(c,db.length);w32(c,db.length);w16(c,nb.length);w16(c,0);w16(c,0);w16(c,0);w16(c,0);w32(c,0);w32(c,off);
+cen.push(new Uint8Array(c),nb);off+=h.length+nb.length+db.length});
+var cs=0,e=[];cen.forEach(function(x){cs+=x.length});
+w32(e,0x06054b50);w16(e,0);w16(e,0);w16(e,files.length);w16(e,files.length);w32(e,cs);w32(e,off);w16(e,0);
+return new Blob(parts.concat(cen,[new Uint8Array(e)]),{type:"application/zip"})}
+function zipList(list,zn){
+var used={},fs=list.map(function(x){var d=safe(lang(x))||"Other",n=fname(x.t,x.l),p=d+"/"+n,k=2;
+while(used[p.toLowerCase()]){p=d+"/"+n.replace(/(\.[^.]*)?$/,function(m){return " ("+(k++)+")"+m})}
+used[p.toLowerCase()]=1;return {n:p,d:x.c||""}});
+save_(zip(fs),zn);say("ZIP downloading: "+zn+" ("+fs.length+" files)")}
+function curFolder(){var l=($("l").value.trim()||"Other").toLowerCase();return items.filter(function(x){return lang(x).toLowerCase()===l})}
+function dmClose(){$("dm").hidden=true}
+$("dw").onclick=function(){
+var f=curFolder();
+$("d2").textContent="🗜 This folder (ZIP) · "+f.length;$("d2").disabled=!f.length;
+$("d3").textContent="🗜 All programs (ZIP) · "+items.length;$("d3").disabled=!items.length;
+$("dm").hidden=false;$("d1").focus()};
+$("d1").onclick=function(){dmClose();
+var c=$("c").value;if(!c){say("Write some code before downloading");return}
+var n=fname($("t").value,$("l").value);
+save_(new Blob([c],{type:"text/plain;charset=utf-8"}),n);say("Downloading: "+n)};
+$("d2").onclick=function(){dmClose();var f=curFolder();if(!f.length){say("This folder has no programs");return}zipList(f,safe($("l").value.trim()||"Other")+".zip")};
+$("d3").onclick=function(){dmClose();if(!items.length){say("No programs yet");return}zipList(items,"codekothi-all.zip")};
+$("d4").onclick=dmClose;
+$("dm").addEventListener("click",function(e){if(e.target===this)dmClose()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("dm").hidden)dmClose()});
 $("q").oninput=render;
-$("nf").onclick=function(){var n=$("fn").value.trim();if(!n){say("Folder cha naav lihaa");return}
+$("nf").onclick=function(){var n=$("fn").value.trim();if(!n){say("Enter a folder name");return}
 var k=n.toLowerCase();
-if((fmap[k]&&!fmap[k].d)||items.some(function(x){return lang(x).toLowerCase()===k})){say("Ha folder aadhich aahe");return}
+if((fmap[k]&&!fmap[k].d)||items.some(function(x){return lang(x).toLowerCase()===k})){say("That folder already exists");return}
 fmap[k]={n:n,u:Date.now(),d:0};openG[k]=true;changed();$("fn").value="";render()};
 $("fn").addEventListener("keydown",function(e){if(e.key==="Enter")$("nf").click()});
+["t","l","g","c","n"].forEach(function(i){$(i).addEventListener("input",function(){dirty=true})});
+window.addEventListener("beforeunload",function(e){if(dirty){e.preventDefault();e.returnValue=""}});
 /* upload */
 function addFiles(fl_){
 fl_=Array.prototype.slice.call(fl_);if(!fl_.length)return;
@@ -220,7 +283,7 @@ r.onerror=function(){skip++;done()};
 r.readAsText(f)});
 function done(){if(--left>0)return;
 if(n){changed();jump=true;open_(last)}
-say(n+" file add zhali"+(skip?", "+skip+" skip (binary/motha)":""))}
+say(n+" file(s) added"+(skip?", "+skip+" skipped (binary/too large)":""))}
 }
 var dr=$("drop");
 dr.onclick=function(){$("fi").click()};
@@ -232,17 +295,17 @@ $("c").addEventListener("dragover",function(ev){ev.preventDefault()});
 $("c").addEventListener("drop",function(ev){if(ev.dataTransfer.files.length){ev.preventDefault();addFiles(ev.dataTransfer.files)}});
 /* backup */
 function bdata(){return JSON.stringify({items:items,folders:fl()})}
-$("ex").onclick=function(){$("bk").value=bdata();say("Export tayar")};
+$("ex").onclick=function(){$("bk").value=bdata();say("Export ready")};
 $("cpb").onclick=function(){copy($("bk").value)};
-$("exf").onclick=function(){var b=new Blob([bdata()],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="codekothi-backup.json";document.body.appendChild(a);a.click();a.remove();say("Backup file tayar")};
+$("exf").onclick=function(){var b=new Blob([bdata()],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="codekothi-backup.json";document.body.appendChild(a);a.click();a.remove();say("Backup file ready")};
 $("imf").onclick=function(){$("bf").click()};
 $("bf").onchange=function(){var f=this.files[0];this.value="";if(!f)return;var r=new FileReader();r.onload=function(){$("bk").value=r.result;$("im").click()};r.readAsText(f)};
 $("im").onclick=function(){
 try{var p=JSON.parse($("bk").value),a=Array.isArray(p)?p:p.items;if(!Array.isArray(a))throw 0;
 (Array.isArray(p.folders)?p.folders:[]).forEach(function(f){var k=String(f).toLowerCase();if(!fmap[k]||fmap[k].d)fmap[k]={n:String(f),u:Date.now(),d:0}});
 var have={};items.forEach(function(i){have[i.id]=1});var n=0;
-a.forEach(function(i){if(i&&i.id&&!have[i.id]){i.u=i.u||Date.now();items.push(i);n++}});
-changed();render();say(n+" program import zhale")}catch(e){say("Backup text barobar nahi")}
+a.forEach(function(i){if(i&&i.id&&!have[i.id]){var o={id:String(i.id),t:String(i.t||""),l:String(i.l||""),g:String(i.g||""),c:String(i.c||""),n:String(i.n||""),u:Date.now()};delete del[o.id];have[o.id]=1;items.push(o);n++}});
+changed();render();say(n+" program(s) imported")}catch(e){say("That backup text is not valid")}
 };
 $("c").addEventListener("keydown",function(e){
 if(e.key==="Tab"){e.preventDefault();var s=this.selectionStart;this.value=this.value.slice(0,s)+"  "+this.value.slice(this.selectionEnd);this.selectionStart=this.selectionEnd=s+2}
@@ -261,8 +324,9 @@ setInterval(function(){if(!document.hidden)sync()},90000);
 })();
 </script>
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+try{
+const {initializeApp}=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js");
+const {getFirestore,doc,getDoc,setDoc}=await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
 const app=initializeApp({
   apiKey:"AIzaSyCxgwEWW0ZBYXhBHGBgGfeHLMxvb8eavu4",
   authDomain:"my-website-be69d.firebaseapp.com",
@@ -278,6 +342,7 @@ window.FB={
   write:(j)=>setDoc(ref(),{data:j,updated:Date.now()})
 };
 window.dispatchEvent(new CustomEvent("fb-auth",{detail:"public"}));
+}catch(e){window.dispatchEvent(new CustomEvent("fb-fail"))}
 </script>
 </body>
 </html>
